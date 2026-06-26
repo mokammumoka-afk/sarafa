@@ -5,6 +5,7 @@ import AdminLayout from './components/layout/AdminLayout';
 
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import AuthCallback from './pages/auth/AuthCallback';
 
 import Dashboard from './pages/user/Dashboard';
 import Deposit from './pages/user/Deposit';
@@ -42,6 +43,7 @@ export default function App() {
     <Routes>
       {/* Public */}
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/register" element={<Register />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />

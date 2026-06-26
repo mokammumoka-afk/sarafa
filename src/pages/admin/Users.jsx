@@ -25,7 +25,7 @@ export default function AdminUsers() {
   }
 
   const filtered = users.filter((u) =>
-    !search || u.full_name?.includes(search) || u.phone?.includes(search) || u.email?.includes(search)
+    !search || u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search) || u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   async function toggleActive(u) {
@@ -40,7 +40,7 @@ export default function AdminUsers() {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 bg-surface-900 border border-white/10 rounded-xl px-3 flex-1">
           <Search size={16} className="text-zinc-500" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="بحث بالاسم أو الهاتف..."
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="بحث بالاسم أو البريد الإلكتروني..."
             className="bg-transparent py-2.5 outline-none flex-1 text-sm" />
         </div>
         <select value={filter} onChange={(e) => setFilter(e.target.value)}
@@ -56,7 +56,7 @@ export default function AdminUsers() {
           <thead className="bg-white/5 text-zinc-400 text-xs">
             <tr>
               <th className="px-4 py-3 text-right">الاسم</th>
-              <th className="px-4 py-3 text-right">الهاتف</th>
+              <th className="px-4 py-3 text-right">البريد / الهاتف</th>
               <th className="px-4 py-3 text-right">رصيد LYD</th>
               <th className="px-4 py-3 text-right">رصيد USDT</th>
               <th className="px-4 py-3 text-right">الحالة</th>
@@ -69,7 +69,7 @@ export default function AdminUsers() {
             {!loading && filtered.map((u) => (
               <tr key={u.id} className="border-t border-white/5">
                 <td className="px-4 py-3"><Link to={`/admin/users/${u.id}`} className="hover:text-accent-400">{u.full_name || '—'}</Link></td>
-                <td className="px-4 py-3 ltr text-right">{u.phone}</td>
+                <td className="px-4 py-3 ltr text-right text-xs">{u.phone || u.email || '—'}</td>
                 <td className="px-4 py-3">{formatLYD(u.balance_lyd)}</td>
                 <td className="px-4 py-3">{formatUSDT(u.balance_usdt)}</td>
                 <td className="px-4 py-3">

@@ -26,7 +26,8 @@ export default function Profile() {
           alt="" className="w-16 h-16 rounded-full object-cover" />
         <div>
           <p className="font-medium">{profile.full_name}</p>
-          <p className="text-sm text-zinc-500 ltr text-right">{profile.phone}</p>
+          <p className="text-sm text-zinc-500 ltr text-right">{profile.email || '—'}</p>
+          {profile.phone && <p className="text-xs text-zinc-600 ltr text-right">{profile.phone}</p>}
         </div>
       </div>
 

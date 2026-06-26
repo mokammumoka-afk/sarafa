@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(undefined); // undefined = loading
   const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -14,9 +15,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!session?.user) { setProfile(null); return; }
+    if (!session?.user) { setProfile(null); setProfileLoading(false); return; }
+    setProfileLoading(true);
     supabase.from('profiles').select('*').eq('id', session.user.id).single()
-      .then(({ data }) => setProfile(data));
+      .then(({ data }) => { setProfile(data); setProfileLoading(false); });
 
     const channel = supabase
       .channel(`profile-${session.user.id}`)
@@ -26,16 +28,24 @@ export function AuthProvider({ children }) {
     return () => supabase.removeChannel(channel);
   }, [session?.user?.id]);
 
-  const sendOtp = (phone) => supabase.auth.signInWithOtp({ phone });
-  const verifyOtp = (phone, token) => supabase.auth.verifyOtp({ phone, token, type: 'sms' });
+  // Google OAuth — replaces the old phone/OTP flow entirely.
+  const signInWithGoogle = () =>
+    supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    });
+
   const signOut = () => supabase.auth.signOut();
 
+  // Onboarding now only needs full name + GPAY number — email comes from Google,
+  // phone is optional and no longer part of the signup flow.
   const needsOnboarding = !!profile && (!profile.full_name || !profile.gpay_number);
 
   return (
     <AuthContext.Provider value={{
-      session, user: session?.user ?? null, profile, loading: session === undefined,
-      sendOtp, verifyOtp, signOut, needsOnboarding
+      session, user: session?.user ?? null, profile,
+      loading: session === undefined || profileLoading,
+      signInWithGoogle, signOut, needsOnboarding
     }}>
       {children}
     </AuthContext.Provider>

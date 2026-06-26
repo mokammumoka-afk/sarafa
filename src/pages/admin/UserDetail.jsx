@@ -53,7 +53,7 @@ export default function AdminUserDetail() {
       <h1 className="font-heading font-bold text-2xl">{profile.full_name || 'مستخدم'}</h1>
 
       <div className="grid grid-cols-4 gap-4 text-sm">
-        <div className="bg-surface-900 border border-white/5 rounded-xl p-4"><p className="text-zinc-500 mb-1">الهاتف</p><p className="ltr text-right">{profile.phone}</p></div>
+        <div className="bg-surface-900 border border-white/5 rounded-xl p-4"><p className="text-zinc-500 mb-1">البريد الإلكتروني</p><p className="ltr text-right text-xs">{profile.email || '—'}</p></div>
         <div className="bg-surface-900 border border-white/5 rounded-xl p-4"><p className="text-zinc-500 mb-1">رصيد LYD</p><p>{formatLYD(profile.balance_lyd)}</p></div>
         <div className="bg-surface-900 border border-white/5 rounded-xl p-4"><p className="text-zinc-500 mb-1">رصيد USDT</p><p>{formatUSDT(profile.balance_usdt)}</p></div>
         <div className="bg-surface-900 border border-white/5 rounded-xl p-4"><p className="text-zinc-500 mb-1">رقم GPAY</p><p className="ltr text-right">{profile.gpay_number || '—'}</p></div>

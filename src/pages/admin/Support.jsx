@@ -16,7 +16,7 @@ export default function AdminSupport() {
 
   async function load() {
     setLoading(true);
-    let q = supabase.from('support_tickets').select('*, profiles(full_name, phone)').order('updated_at', { ascending: false }).limit(100);
+    let q = supabase.from('support_tickets').select('*, profiles(full_name, phone, email)').order('updated_at', { ascending: false }).limit(100);
     if (status !== 'all') q = q.eq('status', status);
     const { data } = await q;
     setTickets(data || []);

@@ -29,7 +29,7 @@ export default function AdminTicketDetail() {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   async function load() {
-    const { data: t } = await supabase.from('support_tickets').select('*, profiles(full_name, phone)').eq('id', id).single();
+    const { data: t } = await supabase.from('support_tickets').select('*, profiles(full_name, phone, email)').eq('id', id).single();
     setTicket(t);
     const { data: m } = await supabase.from('support_messages').select('*').eq('ticket_id', id).order('created_at', { ascending: true });
     setMessages(m || []);
@@ -56,7 +56,7 @@ export default function AdminTicketDetail() {
       <div className="col-span-2 flex flex-col bg-surface-900 border border-white/5 rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-white/5">
           <p className="font-medium">{ticket.subject}</p>
-          <p className="text-xs text-zinc-500">{ticket.profiles?.full_name} · {ticket.profiles?.phone}</p>
+          <p className="text-xs text-zinc-500">{ticket.profiles?.full_name} · {ticket.profiles?.email || ticket.profiles?.phone}</p>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((m) => (

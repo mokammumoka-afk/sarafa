@@ -9,8 +9,8 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-primary-900/95 backdrop-blur-md border-b border-white/5">
-      <Link to="/dashboard" className="font-heading font-bold text-accent-400 text-lg">
-        صرافة <span className="text-white">ليبيا</span>
+      <Link to="/dashboard" className="font-heading font-bold text-accent-400 text-lg ltr">
+        Sarafa <span className="text-white">Libya</span>
       </Link>
       <div className="flex items-center gap-3">
         <Link to="/support" className="text-zinc-400 hover:text-accent-400 transition-colors">

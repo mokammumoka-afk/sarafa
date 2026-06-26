@@ -1,84 +1,38 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
 
+function GoogleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48">
+      <path fill="#FFC107" d="M43.6 20.5H42V20.5H24v7h11.3C33.7 31.9 29.3 35 24 35c-6.1 0-11.3-3.9-13.2-9.3l-7.4 5.7C7.1 38 14.9 43 24 43c10.5 0 19.5-7.6 19.5-19 0-1.2-.1-2.4-.3-3.5z" />
+      <path fill="#FF3D00" d="M6.3 14.7l7.4 5.7C15.6 16.5 19.4 14 24 14c3 0 5.7 1.1 7.8 2.9l6.5-6.5C34.4 6.9 29.5 5 24 5c-7.7 0-14.3 4.3-17.7 10.7z" />
+      <path fill="#4CAF50" d="M24 43c5.4 0 10.3-1.9 14-5l-6.6-5.4c-2 1.4-4.5 2.4-7.4 2.4-5.3 0-9.7-3.1-11.5-7.5l-7.3 5.7C6.7 38.8 14.6 43 24 43z" />
+      <path fill="#1976D2" d="M43.6 20.5H42V20.5H24v7h11.3c-.8 2.3-2.3 4.3-4.1 5.6.7-.6 6.6 5.4 6.6 5.4 3.9-3.6 6.2-8.9 6.2-14.5 0-1.2-.1-2.4-.3-3.5z" />
+    </svg>
+  );
+}
+
 export default function Login() {
-  const { sendOtp, verifyOtp } = useAuth();
-  const navigate = useNavigate();
-  const [step, setStep] = useState('phone'); // phone | otp
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  const fullPhone = () => (phone.startsWith('218') ? `+${phone}` : `+218${phone.replace(/^0/, '')}`);
-
-  async function handleSendOtp(e) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await sendOtp(fullPhone());
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success('تم إرسال رمز التحقق');
-    setStep('otp');
-  }
-
-  async function handleVerify(e) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await verifyOtp(fullPhone(), otp);
-    setBusy(false);
-    if (error) return toast.error('رمز غير صحيح، حاول مجدداً');
-    navigate('/dashboard');
-  }
+  const { signInWithGoogle } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col justify-center px-6 bg-primary-900" dir="rtl">
-      <div className="max-w-sm w-full mx-auto">
-        <h1 className="font-heading font-bold text-3xl text-accent-400 mb-1">صرافة ليبيا</h1>
-        <p className="text-zinc-400 mb-8">محفظتك الرقمية لتداول USDT بأمان</p>
+      <div className="max-w-sm w-full mx-auto text-center">
+        <h1 className="font-heading font-bold text-3xl text-accent-400 mb-1 ltr">Sarafa Libya</h1>
+        <p className="text-zinc-400 mb-10">محفظتك الرقمية لتداول USDT بأمان</p>
 
-        {step === 'phone' ? (
-          <form onSubmit={handleSendOtp} className="space-y-4">
-            <label className="block">
-              <span className="text-sm text-zinc-400 mb-1.5 block">رقم الهاتف</span>
-              <div className="flex items-center bg-surface-800 rounded-xl border border-white/10 px-4">
-                <span className="text-zinc-500 ltr">+218</span>
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="91XXXXXXX"
-                  className="flex-1 bg-transparent py-3.5 px-2 outline-none ltr text-left"
-                />
-              </div>
-            </label>
-            <button disabled={busy} className="w-full bg-accent-400 text-primary-900 font-bold py-3.5 rounded-xl hover:bg-accent-500 disabled:opacity-50 transition-colors">
-              {busy ? 'جارِ الإرسال...' : 'إرسال رمز التحقق'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerify} className="space-y-4">
-            <label className="block">
-              <span className="text-sm text-zinc-400 mb-1.5 block">رمز التحقق (OTP)</span>
-              <input
-                type="text"
-                required
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="------"
-                className="w-full bg-surface-800 rounded-xl border border-white/10 px-4 py-3.5 outline-none text-center text-2xl tracking-widest ltr"
-              />
-            </label>
-            <button disabled={busy} className="w-full bg-accent-400 text-primary-900 font-bold py-3.5 rounded-xl hover:bg-accent-500 disabled:opacity-50 transition-colors">
-              {busy ? 'جارِ التحقق...' : 'تأكيد'}
-            </button>
-            <button type="button" onClick={() => setStep('phone')} className="w-full text-sm text-zinc-500 py-2">
-              تغيير رقم الهاتف
-            </button>
-          </form>
-        )}
+        <button
+          onClick={signInWithGoogle}
+          className="w-full flex items-center justify-center gap-3 bg-white text-zinc-900 font-bold py-3.5 rounded-xl hover:bg-zinc-100 transition-colors"
+        >
+          <GoogleIcon />
+          تسجيل الدخول عبر Google
+        </button>
+
+        <p className="text-xs text-zinc-500 mt-6">
+          بتسجيل الدخول أنت توافق على{' '}
+          <a href="/terms" className="text-accent-400">شروط الخدمة</a> و{' '}
+          <a href="/privacy" className="text-accent-400">سياسة الخصوصية</a>
+        </p>
       </div>
     </div>
   );

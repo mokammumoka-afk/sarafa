@@ -1,15 +1,23 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Register() {
-  const { user } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ full_name: '', gpay_number: '' });
+  // Prefill the name from the Google account if Supabase already captured it on signup.
+  const googleName = user?.user_metadata?.full_name || user?.user_metadata?.name || '';
+  const [form, setForm] = useState({
+    full_name: profile?.full_name || googleName,
+    gpay_number: profile?.gpay_number || ''
+  });
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -30,7 +38,8 @@ export default function Register() {
     <div className="min-h-screen flex flex-col justify-center px-6 bg-primary-900" dir="rtl">
       <div className="max-w-sm w-full mx-auto">
         <h1 className="font-heading font-bold text-2xl mb-1">إكمال البيانات</h1>
-        <p className="text-zinc-400 mb-6 text-sm">خطوة أخيرة قبل البدء</p>
+        <p className="text-zinc-400 mb-1 text-sm">خطوة أخيرة قبل البدء</p>
+        {user?.email && <p className="text-xs text-zinc-500 mb-6 ltr text-left">{user.email}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">

@@ -8,7 +8,7 @@ export default function ProfileEdit() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    full_name: profile?.full_name || '', email: profile?.email || '', gpay_number: profile?.gpay_number || ''
+    full_name: profile?.full_name || '', phone: profile?.phone || '', gpay_number: profile?.gpay_number || ''
   });
   const [busy, setBusy] = useState(false);
 
@@ -46,8 +46,14 @@ export default function ProfileEdit() {
             className="w-full bg-surface-800 rounded-xl border border-white/10 px-4 py-3.5 outline-none" />
         </label>
         <label className="block">
-          <span className="text-sm text-zinc-400 mb-1.5 block">البريد الإلكتروني</span>
-          <input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          <span className="text-sm text-zinc-400 mb-1.5 block">البريد الإلكتروني (من حساب Google)</span>
+          <input type="email" value={profile?.email || ''} disabled
+            className="w-full bg-surface-800/50 rounded-xl border border-white/10 px-4 py-3.5 outline-none ltr text-left text-zinc-500 cursor-not-allowed" />
+        </label>
+        <label className="block">
+          <span className="text-sm text-zinc-400 mb-1.5 block">رقم الهاتف (اختياري)</span>
+          <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            placeholder="+218XXXXXXXXX"
             className="w-full bg-surface-800 rounded-xl border border-white/10 px-4 py-3.5 outline-none ltr text-left" />
         </label>
         <label className="block">

@@ -10,7 +10,7 @@ create extension if not exists pgcrypto;
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null default '',
-  phone text unique not null,
+  phone text unique,
   email text,
   gpay_number text default '',
   gpay_wallet_id text default '',
@@ -189,7 +189,7 @@ insert into settings (key, value, description) values
   ('deposit_limits', '{"min":50,"max":10000}', 'حدود الشحن'),
   ('withdraw_limits', '{"min":100,"max_daily":5000}', 'حدود السحب'),
   ('trade_limits', '{"min_buy_usdt":10,"min_sell_usdt":10}', 'حدود التداول'),
-  ('company_info', '{"name":"صرافة ليبيا الرقمية","usdt_wallet":"","gpay_number":""}', 'بيانات الشركة');
+  ('company_info', '{"name":"Sarafa Libya","usdt_wallet":"","gpay_number":""}', 'بيانات الشركة');
 
 insert into exchange_rates (buy_rate, sell_rate, source) values (5.20, 5.35, 'manual');
 
@@ -255,8 +255,14 @@ create policy "Admins manage settings" on settings for all using (exists (select
 create or replace function handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, phone, email)
-  values (new.id, coalesce(new.phone, ''), new.email);
+  insert into public.profiles (id, phone, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.phone,  -- null for Google sign-ins; only populated if phone auth is used elsewhere
+    new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', '')
+  );
   return new;
 end;
 $$ language plpgsql security definer;
