@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  font-family: 'Cairo', sans-serif;
+  background: #0A0E1A;
+  color: #F1F2F4;
+}
+
+h1, h2, h3, .font-heading {
+  font-family: 'Tajawal', sans-serif;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2A3142; border-radius: 4px; }
+
+.skeleton {
+  background: linear-gradient(90deg, #1A1F2E 25%, #232a3c 37%, #1A1F2E 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
