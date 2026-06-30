@@ -56,9 +56,23 @@ export function AuthProvider({ children }) {
     return () => { supabase.removeChannel(channel); if (retryTimer.current) clearTimeout(retryTimer.current); };
   }, [session?.user?.id, fetchProfile]);
 
+  // Returns a promise so callers (e.g. Register.jsx) can await the fresh
+  // profile before navigating, instead of racing the realtime UPDATE event.
   const refreshProfile = useCallback(() => {
-    if (session?.user) { setProfileLoading(true); fetchProfile(session.user.id); }
+    if (session?.user) { setProfileLoading(true); return fetchProfile(session.user.id); }
+    return Promise.resolve();
   }, [session?.user, fetchProfile]);
+
+  // Optimistically merges a patch into the local profile immediately — used
+  // right after a successful write so `needsOnboarding` flips synchronously
+  // instead of waiting on a network round-trip or the realtime channel. This
+  // is what actually fixes "after registering nothing happens": without it,
+  // navigate('/dashboard') used to fire while `profile` was still stale, so
+  // MainLayout's needsOnboarding check bounced the user straight back to
+  // /register.
+  const patchProfileLocal = useCallback((patch) => {
+    setProfile((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
 
   // Google OAuth — replaces the old phone/OTP flow entirely.
   const signInWithGoogle = () =>
@@ -77,7 +91,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       session, user: session?.user ?? null, profile,
       loading: session === undefined || profileLoading,
-      profileError, refreshProfile,
+      profileError, refreshProfile, patchProfileLocal,
       signInWithGoogle, signOut, needsOnboarding
     }}>
       {children}

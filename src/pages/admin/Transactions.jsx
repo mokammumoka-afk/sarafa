@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatLYD, formatUSDT, formatDate, TYPE_LABELS } from '../../lib/utils';
+import { exportToCsv } from '../../lib/exportCsv';
 import StatusBadge from '../../components/shared/StatusBadge';
 
 const TABS = [
@@ -77,9 +79,21 @@ export default function AdminTransactions() {
     toast.success('تم رفض الطلب'); load();
   }
 
+  function exportCsv() {
+    exportToCsv(`transactions-${tab}-${Date.now()}.csv`, txns.map((t) => ({
+      id: t.id, user: t.profiles?.full_name || '', type: t.type, status: t.status,
+      amount_lyd: t.amount_lyd, amount_usdt: t.amount_usdt, created_at: t.created_at, completed_at: t.completed_at
+    })));
+  }
+
   return (
     <div className="space-y-4">
-      <h1 className="font-heading font-bold text-2xl">إدارة المعاملات</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-heading font-bold text-2xl">إدارة المعاملات</h1>
+        <button onClick={exportCsv} disabled={!txns.length} className="flex items-center gap-1.5 text-sm bg-surface-800 border border-white/10 px-3 py-2 rounded-xl disabled:opacity-40">
+          <Download size={15} /> تصدير CSV
+        </button>
+      </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">
         {TABS.map((t) => (

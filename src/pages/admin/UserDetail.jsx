@@ -16,6 +16,8 @@ export default function AdminUserDetail() {
   const [adjustUsdt, setAdjustUsdt] = useState('');
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
+  const [notif, setNotif] = useState({ title: '', body: '' });
+  const [sendingNotif, setSendingNotif] = useState(false);
 
   useEffect(() => { load(); }, [id]);
 
@@ -45,6 +47,17 @@ export default function AdminUserDetail() {
     await supabase.from('profiles').update({ is_admin: !profile.is_admin }).eq('id', id);
     toast.success('تم تحديث الصلاحيات');
     load();
+  }
+
+  async function sendNotification(e) {
+    e.preventDefault();
+    if (!notif.title.trim() || !notif.body.trim()) return toast.error('أدخل العنوان والمحتوى');
+    setSendingNotif(true);
+    const { error } = await supabase.from('notifications').insert({ user_id: id, title: notif.title, body: notif.body, type: 'system' });
+    setSendingNotif(false);
+    if (error) return toast.error(error.message);
+    toast.success('تم إرسال الإشعار');
+    setNotif({ title: '', body: '' });
   }
 
   if (!profile) return <div className="h-64 skeleton rounded-xl" />;
@@ -81,7 +94,7 @@ export default function AdminUserDetail() {
 
         <div className="bg-surface-900 border border-white/5 rounded-2xl p-5">
           <p className="font-medium mb-3">إجراءات الحساب</p>
-          <div className="flex flex-col gap-2 text-sm">
+          <div className="flex flex-col gap-2 text-sm mb-4">
             <button onClick={() => supabase.from('profiles').update({ is_active: !profile.is_active }).eq('id', id).then(load)}
               className="text-right bg-surface-800 border border-white/10 rounded-xl px-3 py-2.5">
               {profile.is_active ? 'تعطيل الحساب' : 'تفعيل الحساب'}
@@ -90,6 +103,16 @@ export default function AdminUserDetail() {
               {profile.is_admin ? 'إزالة صلاحيات المسؤول' : 'تعيين كمسؤول'}
             </button>
           </div>
+          <p className="font-medium mb-2 text-sm">إرسال إشعار لهذا المستخدم</p>
+          <form onSubmit={sendNotification} className="space-y-2">
+            <input placeholder="العنوان" value={notif.title} onChange={(e) => setNotif((n) => ({ ...n, title: e.target.value }))}
+              className="w-full bg-surface-800 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none" />
+            <textarea placeholder="المحتوى" rows={2} value={notif.body} onChange={(e) => setNotif((n) => ({ ...n, body: e.target.value }))}
+              className="w-full bg-surface-800 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none resize-none" />
+            <button disabled={sendingNotif} className="bg-accent-400 text-primary-900 font-bold px-4 py-2 rounded-xl text-sm disabled:opacity-50">
+              {sendingNotif ? 'جارِ الإرسال...' : 'إرسال'}
+            </button>
+          </form>
         </div>
       </div>
 

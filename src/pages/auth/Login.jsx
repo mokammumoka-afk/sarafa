@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 function GoogleIcon() {
@@ -13,12 +15,27 @@ function GoogleIcon() {
 
 export default function Login() {
   const { signInWithGoogle } = useAuth();
+  const [params] = useSearchParams();
+  const refCode = params.get('ref');
+
+  // A referral link points here (the only screen an unauthenticated visitor
+  // can land on). Stash the code before the Google round-trip so Register.jsx
+  // can register it once the profile exists on the other side.
+  useEffect(() => {
+    if (refCode) localStorage.setItem('sarafa_ref_code', refCode);
+  }, [refCode]);
 
   return (
     <div className="min-h-screen flex flex-col justify-center px-6 bg-primary-900" dir="rtl">
       <div className="max-w-sm w-full mx-auto text-center">
         <h1 className="font-heading font-bold text-3xl text-accent-400 mb-1 ltr">Sarafa Libya</h1>
         <p className="text-zinc-400 mb-10">محفظتك الرقمية لتداول USDT بأمان</p>
+
+        {refCode && (
+          <p className="text-xs text-accent-400 bg-accent-400/10 border border-accent-400/20 rounded-xl py-2 px-3 mb-5">
+            🎁 تمت دعوتك للانضمام — أكمل التسجيل لتفعيل المكافأة
+          </p>
+        )}
 
         <button
           onClick={signInWithGoogle}

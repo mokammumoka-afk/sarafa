@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../hooks/useNotifications';
+import Avatar from '../shared/Avatar';
 
 export default function Header() {
   const { user, profile } = useAuth();
   const { unreadCount } = useNotifications(user?.id);
-  const avatarFallback = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile?.full_name || 'S L')}&backgroundColor=1A1F2E&textColor=D4AF37`;
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-primary-900/95 backdrop-blur-md border-b border-white/5">
@@ -27,11 +27,7 @@ export default function Header() {
           )}
         </Link>
         <Link to="/profile">
-          <img
-            src={profile?.avatar_url || avatarFallback}
-            alt="حسابي"
-            className="w-8 h-8 rounded-full object-cover border border-white/10"
-          />
+          <Avatar src={profile?.avatar_url} name={profile?.full_name} size={32} className="border border-white/10" />
         </Link>
       </div>
     </header>

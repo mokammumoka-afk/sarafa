@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import PageHeader from '../../components/shared/PageHeader';
+import Avatar from '../../components/shared/Avatar';
 
 export default function ProfileEdit() {
   const { user, profile } = useAuth();
@@ -14,7 +15,7 @@ export default function ProfileEdit() {
   const [busy, setBusy] = useState(false);
 
   async function uploadAvatar(file) {
-    const path = `avatars/${user.id}/${Date.now()}.${file.name.split('.').pop()}`;
+    const path = `${user.id}/${Date.now()}.${file.name.split('.').pop()}`;
     const { error } = await supabase.storage.from('avatars').upload(path, file);
     if (error) return toast.error(error.message);
     const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
@@ -37,8 +38,7 @@ export default function ProfileEdit() {
       <PageHeader title="تعديل الملف الشخصي" to="/profile" />
       <div className="space-y-5">
         <div className="flex items-center gap-4">
-          <img src={profile?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile?.full_name || 'S L')}&backgroundColor=1A1F2E&textColor=D4AF37`}
-            alt="" className="w-16 h-16 rounded-full object-cover border-2 border-accent-400/30" />
+          <Avatar src={profile?.avatar_url} name={profile?.full_name} size={64} className="border-2 border-accent-400/30" />
           <label className="text-sm text-accent-400 cursor-pointer">
             تغيير الصورة
             <input type="file" accept="image/*" onChange={(e) => e.target.files[0] && uploadAvatar(e.target.files[0])} className="hidden" />

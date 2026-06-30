@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Download } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatLYD, formatUSDT, formatDate } from '../../lib/utils';
+import { exportToCsv } from '../../lib/exportCsv';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -33,9 +34,21 @@ export default function AdminUsers() {
     load();
   }
 
+  function exportCsv() {
+    exportToCsv(`users-${Date.now()}.csv`, filtered.map((u) => ({
+      name: u.full_name || '', email: u.email || '', phone: u.phone || '',
+      balance_lyd: u.balance_lyd, balance_usdt: u.balance_usdt, is_active: u.is_active, created_at: u.created_at
+    })));
+  }
+
   return (
     <div className="space-y-4">
-      <h1 className="font-heading font-bold text-2xl">إدارة المستخدمين</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-heading font-bold text-2xl">إدارة المستخدمين</h1>
+        <button onClick={exportCsv} disabled={!filtered.length} className="flex items-center gap-1.5 text-sm bg-surface-800 border border-white/10 px-3 py-2 rounded-xl disabled:opacity-40">
+          <Download size={15} /> تصدير CSV
+        </button>
+      </div>
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 bg-surface-900 border border-white/10 rounded-xl px-3 flex-1">

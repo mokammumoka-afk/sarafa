@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Register() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, patchProfileLocal } = useAuth();
   const navigate = useNavigate();
   // Prefill the name from the Google account if Supabase already captured it on signup.
   const googleName = user?.user_metadata?.full_name || user?.user_metadata?.name || '';
@@ -23,15 +23,33 @@ export default function Register() {
     e.preventDefault();
     if (!agreed) return toast.error('يجب الموافقة على شروط الخدمة');
     setBusy(true);
+
     const { error } = await supabase.from('profiles').update({
       full_name: form.full_name,
       gpay_number: form.gpay_number,
       updated_at: new Date().toISOString()
     }).eq('id', user.id);
+
+    if (error) { setBusy(false); return toast.error(error.message); }
+
+    // Apply the change locally right away — needsOnboarding depends on
+    // `profile`, and waiting for the realtime UPDATE event before navigating
+    // is what used to make this screen feel stuck after pressing confirm.
+    patchProfileLocal({ full_name: form.full_name, gpay_number: form.gpay_number });
+
+    // If this user arrived through a referral link, Login.jsx stashed the
+    // code in localStorage before the Google redirect. Register it now that
+    // the profile (and referral_code) definitely exist. Best-effort: a
+    // failure here should never block the user from reaching the app.
+    const pendingRefCode = localStorage.getItem('sarafa_ref_code');
+    if (pendingRefCode) {
+      await supabase.rpc('register_referral', { p_referred_id: user.id, p_code: pendingRefCode }).catch(() => {});
+      localStorage.removeItem('sarafa_ref_code');
+    }
+
     setBusy(false);
-    if (error) return toast.error(error.message);
     toast.success('تم إكمال التسجيل بنجاح');
-    navigate('/dashboard');
+    navigate('/dashboard', { replace: true });
   }
 
   return (

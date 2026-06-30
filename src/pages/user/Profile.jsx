@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatDate, formatLYD, formatUSDT } from '../../lib/utils';
+import Avatar from '../../components/shared/Avatar';
 
 export default function Profile() {
   const { profile, loading, profileError, refreshProfile, signOut } = useAuth();
@@ -54,8 +55,7 @@ export default function Profile() {
       <h1 className="font-heading font-bold text-xl">الحساب</h1>
 
       <div className="flex items-center gap-4 bg-gradient-to-br from-surface-800 to-surface-900 rounded-2xl p-4 border border-white/5">
-        <img src={profile.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile.full_name || 'S L')}&backgroundColor=1A1F2E&textColor=D4AF37`}
-          alt="" className="w-16 h-16 rounded-full object-cover border-2 border-accent-400/30" />
+        <Avatar src={profile.avatar_url} name={profile.full_name} size={64} className="border-2 border-accent-400/30" />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-base truncate">{profile.full_name || 'مستخدم'}</p>
           <p className="text-sm text-zinc-500 ltr text-right truncate">{profile.email || '—'}</p>

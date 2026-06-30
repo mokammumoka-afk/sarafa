@@ -42,5 +42,6 @@ export const TYPE_LABELS = {
   withdraw: 'سحب',
   admin_adjustment: 'تعديل إداري',
   referral_bonus: 'مكافأة إحالة',
-  fee: 'رسوم'
+  fee: 'رسوم',
+  p2p: 'P2P'
 };
